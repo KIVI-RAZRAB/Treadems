@@ -3,8 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0b0e14">
-<title>Treadems.gg</title>
+<title>Treadems — Mobile Crypto Trading Simulator</title>
 
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%232962ff'/><path d='M8 22L14 14L18 18L24 10M24 10H19M24 10V15' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/></svg>">
 
@@ -15,7 +17,7 @@
 
 <style>
 /* =========================================================================
-   1. BASE STYLES & PRO TRADING DARK THEME (HIGH PERFORMANCE)
+   1. BASE STYLES & iOS RETINA OPTIMIZED DARK THEME
    ========================================================================= */
 :root {
   --bg-main: #0b0e14;
@@ -39,8 +41,8 @@
   --gold: #f0b90b;
   --gold-bg: rgba(240, 185, 11, 0.15);
 
-  --nav-h: 62px;
-  --header-h: 56px;
+  --nav-h: calc(62px + env(safe-area-inset-bottom, 0px));
+  --header-h: calc(56px + env(safe-area-inset-top, 0px));
   --radius: 14px;
   --radius-sm: 8px;
 }
@@ -50,13 +52,20 @@
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
+  -webkit-user-select: none;
+}
+
+input, button, select {
+  font-family: inherit;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 html, body {
   width: 100%; height: 100%;
   height: 100dvh;
   overflow: hidden;
-  font-family: 'Inter', -apple-system, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   background-color: var(--bg-main);
   color: var(--text-main);
   line-height: 1.35;
@@ -66,12 +75,8 @@ html, body {
 .mono { font-family: 'JetBrains Mono', monospace; }
 .hidden { display: none !important; }
 
-/* Smooth Scrollbars */
-::-webkit-scrollbar { width: 4px; height: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+::-webkit-scrollbar { width: 0px; height: 0px; }
 
-/* Smooth Hardware-Accelerated Transitions */
 @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes pulseGlow { 0% { box-shadow: 0 0 0 0 rgba(41, 98, 255, 0.4); } 70% { box-shadow: 0 0 0 8px rgba(41, 98, 255, 0); } 100% { box-shadow: 0 0 0 0 rgba(41, 98, 255, 0); } }
 
@@ -86,11 +91,10 @@ html, body {
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
   padding: 10px 16px; border-radius: var(--radius-sm); font-size: 13.5px; font-weight: 700;
   background: var(--bg-panel); border: 1px solid var(--border); color: var(--text-main);
-  cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  will-change: transform, opacity;
-  white-space: nowrap; outline: none;
+  cursor: pointer; transition: transform 0.1s ease, opacity 0.1s ease;
+  will-change: transform; white-space: nowrap; outline: none;
 }
-.btn:active { transform: scale(0.96); opacity: 0.85; }
+.btn:active { transform: scale(0.95); opacity: 0.85; }
 .btn.primary { background: var(--blue); border: none; color: #fff; box-shadow: 0 4px 16px rgba(41,98,255,0.35); }
 .btn.buy { background: var(--green); border: none; color: #000; font-weight: 800; box-shadow: 0 4px 16px rgba(14,203,129,0.3); }
 .btn.sell { background: var(--red); border: none; color: #fff; font-weight: 800; box-shadow: 0 4px 16px rgba(246,70,93,0.3); }
@@ -103,9 +107,9 @@ html, body {
   width: 100%; padding: 10px 12px; border-radius: var(--radius-sm);
   background: var(--bg-input); border: 1px solid var(--border);
   color: var(--text-main); font-size: 14px; font-weight: 600; outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  -webkit-user-select: text; user-select: text;
 }
-.inp:focus { border-color: var(--blue); box-shadow: 0 0 0 2px rgba(41,98,255,0.2); }
+.inp:focus { border-color: var(--blue); }
 
 .field { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
 .field label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
@@ -128,8 +132,8 @@ html, body {
   animation: pulseGlow 2s infinite;
 }
 .auth-tabs { display: flex; background: var(--bg-input); padding: 3px; border-radius: var(--radius-sm); margin: 16px 0; }
-.auth-tab { flex: 1; padding: 8px; border-radius: 6px; font-size: 13px; font-weight: 700; color: var(--text-muted); border: none; background: transparent; cursor: pointer; transition: all 0.2s ease; }
-.auth-tab.active { background: var(--bg-panel); color: var(--text-main); box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+.auth-tab { flex: 1; padding: 8px; border-radius: 6px; font-size: 13px; font-weight: 700; color: var(--text-muted); border: none; background: transparent; cursor: pointer; }
+.auth-tab.active { background: var(--bg-panel); color: var(--text-main); }
 .captcha-box { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
 .captcha-box canvas { border-radius: 6px; background: #000; border: 1px solid var(--border); }
 .err-msg { color: var(--red); font-size: 12px; font-weight: 600; min-height: 16px; margin-top: 8px; }
@@ -138,23 +142,24 @@ html, body {
 
 .header {
   height: var(--header-h); flex-shrink: 0;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 14px; background: var(--bg-card); border-bottom: 1px solid var(--border);
+  display: flex; align-items: flex-end; justify-content: space-between;
+  padding: 0 14px 10px 14px; background: var(--bg-card); border-bottom: 1px solid var(--border);
 }
 .user-pill { display: flex; align-items: center; gap: 10px; }
 .lvl-badge { padding: 2px 6px; border-radius: 6px; background: var(--gold-bg); color: var(--gold); font-size: 10.5px; font-weight: 800; }
 .cash-display { font-size: 14px; font-weight: 800; color: var(--green); }
 
-.content-area { flex: 1; height: calc(100dvh - var(--header-h) - var(--nav-h)); overflow-y: auto; position: relative; }
+.content-area { flex: 1; height: calc(100dvh - var(--header-h) - var(--nav-h)); overflow-y: auto; position: relative; -webkit-overflow-scrolling: touch; }
 
 .bottom-nav {
   height: var(--nav-h); flex-shrink: 0;
   display: grid; grid-template-columns: repeat(4, 1fr);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
   background: var(--bg-card); border-top: 1px solid var(--border); z-index: 100;
 }
 .nav-item {
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
-  color: var(--text-muted); font-size: 10.5px; font-weight: 700; cursor: pointer; transition: color 0.2s ease;
+  color: var(--text-muted); font-size: 10.5px; font-weight: 700; cursor: pointer;
 }
 .nav-item.active { color: var(--blue); }
 
@@ -162,25 +167,18 @@ html, body {
 .padding-box { padding: 14px; }
 .card-panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; margin-bottom: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
 
-/* Pro Market Tickers & Grid */
-.market-header-stats {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px;
-}
-.ticker-card {
-  background: var(--bg-card); border: 1px solid var(--border);
-  border-radius: var(--radius-sm); padding: 8px 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-}
+.market-header-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+.ticker-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px 10px; }
 .ticker-card .title { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
 .ticker-card .val { font-size: 12.5px; font-weight: 800; margin-top: 2px; }
 
 .coin-row {
   display: flex; align-items: center; justify-content: space-between;
   padding: 12px 14px; border-bottom: 1px solid var(--border); cursor: pointer;
-  transition: background 0.15s ease;
 }
-.coin-row:hover, .coin-row:active { background: rgba(41, 98, 255, 0.08); }
+.coin-row:active { background: rgba(41, 98, 255, 0.12); }
 .coin-left { display: flex; align-items: center; gap: 10px; }
-.coin-icon { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: 12px; color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+.coin-icon { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: 12px; color: #fff; }
 .coin-symbol { font-weight: 800; font-size: 14px; }
 .coin-name { font-size: 11px; color: var(--text-muted); }
 .coin-right { text-align: right; }
@@ -189,70 +187,54 @@ html, body {
 .coin-chg.up { color: var(--green); background: var(--green-bg); }
 .coin-chg.down { color: var(--red); background: var(--red-bg); }
 
-/* Pro Terminal & Order Book */
+/* Full-Screen Canvas Chart */
 .terminal-screen { display: flex; flex-direction: column; height: 100%; }
 .terminal-bar { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--bg-main); border-bottom: 1px solid var(--border); }
 .tf-selector { display: flex; gap: 4px; }
-.tf-btn { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; color: var(--text-muted); background: transparent; border: none; cursor: pointer; transition: 0.15s; }
+.tf-btn { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; color: var(--text-muted); background: transparent; border: none; cursor: pointer; }
 .tf-btn.active { color: var(--text-main); background: var(--bg-panel); }
 
-.terminal-main-layout { display: flex; flex: 1; overflow: hidden; }
-.chart-box { flex: 1; position: relative; width: 100%; min-height: 180px; background: var(--bg-main); }
-.chart-box canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
-
-/* Pro Order Book Side Panel */
-.order-book {
-  width: 130px; background: var(--bg-card); border-left: 1px solid var(--border);
-  display: flex; flex-direction: column; font-size: 10.5px; padding: 6px; gap: 2px; overflow: hidden;
-}
-.ob-row { display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; padding: 1px 2px; }
-.ob-ask { color: var(--red); }
-.ob-bid { color: var(--green); }
-.ob-spread { text-align: center; font-weight: 800; font-size: 11px; padding: 4px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin: 3px 0; color: var(--text-muted); }
+.terminal-main-layout { display: flex; flex: 1; overflow: hidden; width: 100%; position: relative; }
+.chart-box { flex: 1; position: relative; width: 100%; height: 100%; background: var(--bg-main); }
+.chart-box canvas { display: block; width: 100%; height: 100%; }
 
 .trade-panel-bottom { background: var(--bg-card); border-top: 1px solid var(--border); padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
 .order-type-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .pct-btns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
 
-/* Shop & Profile components */
 .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-.stat-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+.stat-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; }
 .stat-item label { font-size: 10.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
 .stat-item .val { font-size: 15px; font-weight: 800; margin-top: 2px; }
 
 .shop-tabs { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 2px; }
-.shop-tab { padding: 6px 12px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 700; background: var(--bg-panel); border: 1px solid var(--border); color: var(--text-muted); cursor: pointer; white-space: nowrap; transition: all 0.2s ease; }
+.shop-tab { padding: 6px 12px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 700; background: var(--bg-panel); border: 1px solid var(--border); color: var(--text-muted); cursor: pointer; white-space: nowrap; }
 .shop-tab.active { background: var(--blue-bg); border-color: var(--blue); color: var(--text-main); }
 
 .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
-.shop-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; gap: 8px; transition: transform 0.2s ease; }
-.shop-card:hover { transform: translateY(-2px); }
+.shop-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; gap: 8px; }
 
-/* Avatars */
 .av-box { position: relative; width: 40px; height: 40px; border-radius: 50%; display: inline-grid; place-items: center; flex-shrink: 0; }
 .av-ring { position: absolute; inset: -2px; border-radius: 50%; z-index: 1; }
 .av-inner { width: 100%; height: 100%; border-radius: 50%; overflow: hidden; background: var(--bg-panel); display: grid; place-items: center; z-index: 2; font-weight: 800; font-size: 13px; }
 .av-inner img { width: 100%; height: 100%; object-fit: cover; }
 
-/* Modal & Toast */
 #toast-container { position: fixed; top: 12px; left: 14px; right: 14px; z-index: 1000; pointer-events: none; display: flex; flex-direction: column; gap: 6px; }
-.toast { padding: 10px 14px; border-radius: var(--radius-sm); font-size: 12.5px; font-weight: 700; background: var(--bg-panel); border: 1px solid var(--border); color: var(--text-main); box-shadow: 0 10px 30px rgba(0,0,0,0.5); animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1); display: flex; align-items: center; gap: 8px; will-change: transform, opacity; }
+.toast { padding: 10px 14px; border-radius: var(--radius-sm); font-size: 12.5px; font-weight: 700; background: var(--bg-panel); border: 1px solid var(--border); color: var(--text-main); box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 8px; }
 .toast.ok { border-color: var(--green); color: var(--green); }
 .toast.err { border-color: var(--red); color: var(--red); }
 </style>
 </head>
 <body>
 
-<!-- =========================================================================
-   AUTH SCREEN
-   ========================================================================= -->
+<!-- AUTH SCREEN -->
 <div id="auth-screen" class="auth-wrapper">
   <div class="auth-card">
     <div class="brand-icon">
       <svg class="svg-icon" style="width:26px; height:26px;" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
     </div>
     <h2 style="font-size:20px; font-weight:900;">Treadems</h2>
-    <p style="font-size:12px; color:var(--text-muted); margin-top:2px;">Pro Crypto Exchange Simulator</p>
+    <p style="font-size:12px; color:var(--text-muted); margin-top:2px;">Mobile Crypto Exchange</p>
 
     <div class="auth-tabs">
       <button class="auth-tab active" id="tab-login" onclick="setAuthTab('login')">Вход</button>
@@ -262,7 +244,7 @@ html, body {
     <form id="auth-form" onsubmit="handleAuth(event)">
       <div class="field">
         <label>Логин</label>
-        <input type="text" id="auth-login" class="inp" placeholder="Ваш логин" required maxlength="16">
+        <input type="text" id="auth-login" class="inp" placeholder="Ваш логин" required maxlength="16" autocomplete="off">
       </div>
       <div class="field">
         <label>Пароль</label>
@@ -292,9 +274,7 @@ html, body {
   </div>
 </div>
 
-<!-- =========================================================================
-   MAIN APP LAYOUT
-   ========================================================================= -->
+<!-- MAIN APP SCREEN -->
 <div id="app-screen" class="app-layout hidden">
   <header class="header">
     <div class="user-pill">
@@ -334,40 +314,42 @@ html, body {
 <div id="toast-container"></div>
 <input type="file" id="avatar-input" accept="image/*" class="hidden" onchange="uploadAvatar(event)">
 
-<!-- =========================================================================
-   JAVASCRIPT ENGINE & REAL-TIME INTERACTION
-   ========================================================================= -->
 <script>
 class SoundFx {
-  constructor() { this.ctx = null; this.enabled = true; }
-  init() { if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); }
+  constructor() { this.ctx = null; }
+  init() { 
+    try {
+      if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); 
+    } catch(e){}
+  }
   play(type) {
-    if (!this.enabled) return;
     this.init();
     if (!this.ctx) return;
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-    osc.connect(gain); gain.connect(this.ctx.destination);
-    const now = this.ctx.currentTime;
+    try {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.connect(gain); gain.connect(this.ctx.destination);
+      const now = this.ctx.currentTime;
 
-    if (type === 'buy') {
-      osc.frequency.setValueAtTime(440, now);
-      osc.frequency.exponentialRampToValueAtTime(880, now + 0.12);
-      gain.gain.setValueAtTime(0.15, now);
-      gain.gain.linearRampToValueAtTime(0.01, now + 0.12);
-      osc.start(now); osc.stop(now + 0.12);
-    } else if (type === 'sell') {
-      osc.frequency.setValueAtTime(600, now);
-      osc.frequency.exponentialRampToValueAtTime(300, now + 0.12);
-      gain.gain.setValueAtTime(0.15, now);
-      gain.gain.linearRampToValueAtTime(0.01, now + 0.12);
-      osc.start(now); osc.stop(now + 0.12);
-    } else if (type === 'click') {
-      osc.frequency.setValueAtTime(800, now);
-      gain.gain.setValueAtTime(0.05, now);
-      gain.gain.linearRampToValueAtTime(0.01, now + 0.04);
-      osc.start(now); osc.stop(now + 0.04);
-    }
+      if (type === 'buy') {
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.exponentialRampToValueAtTime(880, now + 0.12);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.12);
+        osc.start(now); osc.stop(now + 0.12);
+      } else if (type === 'sell') {
+        osc.frequency.setValueAtTime(600, now);
+        osc.frequency.exponentialRampToValueAtTime(300, now + 0.12);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.12);
+        osc.start(now); osc.stop(now + 0.12);
+      } else if (type === 'click') {
+        osc.frequency.setValueAtTime(800, now);
+        gain.gain.setValueAtTime(0.05, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.04);
+        osc.start(now); osc.stop(now + 0.04);
+      }
+    } catch(e){}
   }
 }
 const sounds = new SoundFx();
@@ -433,8 +415,8 @@ const PROMOS = {
 };
 
 let DB = {
-  users: JSON.parse(localStorage.getItem('treadems_users_v8') || '{}'),
-  session: localStorage.getItem('treadems_session_v8') || null
+  users: JSON.parse(localStorage.getItem('treadems_users_v10') || '{}'),
+  session: localStorage.getItem('treadems_session_v10') || null
 };
 
 let marketHistory = {};
@@ -451,9 +433,9 @@ Object.keys(ASSETS).forEach(s => {
 });
 
 function saveDB() {
-  localStorage.setItem('treadems_users_v8', JSON.stringify(DB.users));
-  if (DB.session) localStorage.setItem('treadems_session_v8', DB.session);
-  else localStorage.removeItem('treadems_session_v8');
+  localStorage.setItem('treadems_users_v10', JSON.stringify(DB.users));
+  if (DB.session) localStorage.setItem('treadems_session_v10', DB.session);
+  else localStorage.removeItem('treadems_session_v10');
 }
 
 function getUser() { return DB.session ? DB.users[DB.session] : null; }
@@ -487,7 +469,7 @@ function addXP(u, amount) {
   renderHeader();
 }
 
-/* Dynamic Price Movement Loop */
+/* iOS Dynamic Smooth Movement Engine */
 setInterval(() => {
   marketVol24 += Math.floor(Math.random() * 1200);
   Object.keys(ASSETS).forEach(s => {
@@ -526,15 +508,23 @@ function smoothPriceLoop() {
 }
 requestAnimationFrame(smoothPriceLoop);
 
-/* Smooth Canvas Chart Scroller */
+/* Canvas iOS High-DPI Retina Renderer */
 function drawChart() {
   const canvas = document.getElementById('chart-canvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   const parent = canvas.parentElement;
 
-  const w = canvas.width = parent.clientWidth;
-  const h = canvas.height = parent.clientHeight;
+  const dpr = window.devicePixelRatio || 1;
+  const rect = parent.getBoundingClientRect();
+
+  if (canvas.width !== rect.width * dpr || canvas.height !== rect.height * dpr) {
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+  }
+
+  const w = canvas.width;
+  const h = canvas.height;
   ctx.clearRect(0, 0, w, h);
 
   const hist = marketHistory[activeSym];
@@ -549,8 +539,8 @@ function drawChart() {
   const max = Math.max(...chartData);
   const range = (max - min) || 1;
 
-  ctx.strokeStyle = 'rgba(255,255,255,0.03)';
-  ctx.lineWidth = 1;
+  ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+  ctx.lineWidth = 1 * dpr;
   for (let i = 1; i < 5; i++) {
     const y = (h / 5) * i;
     ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
@@ -558,7 +548,7 @@ function drawChart() {
 
   const pts = chartData.map((v, i) => ({
     x: (i / (chartData.length - 1)) * w,
-    y: h - ((v - min) / range) * (h - 32) - 16
+    y: h - ((v - min) / range) * (h - (32 * dpr)) - (16 * dpr)
   }));
 
   ctx.beginPath();
@@ -569,7 +559,7 @@ function drawChart() {
     ctx.quadraticCurveTo(pts[i - 1].x, pts[i - 1].y, xc, yc);
   }
   ctx.strokeStyle = color;
-  ctx.lineWidth = 2.5;
+  ctx.lineWidth = 2.5 * dpr;
   ctx.stroke();
 
   const grad = ctx.createLinearGradient(0, 0, 0, h);
@@ -581,15 +571,14 @@ function drawChart() {
 
   const last = pts[pts.length - 1];
   ctx.beginPath();
-  ctx.arc(last.x, last.y, 5, 0, Math.PI * 2);
+  ctx.arc(last.x, last.y, 5 * dpr, 0, Math.PI * 2);
   ctx.fillStyle = color;
   ctx.fill();
-  ctx.lineWidth = 2;
+  ctx.lineWidth = 2 * dpr;
   ctx.strokeStyle = '#fff';
   ctx.stroke();
 }
 
-/* Auth Logic */
 function setAuthTab(mode) {
   authMode = mode;
   document.getElementById('tab-login').classList.toggle('active', mode === 'login');
@@ -647,7 +636,6 @@ function startApp() {
   switchNav('market');
 }
 
-/* Avatar & User Header */
 function renderAvatarHTML(u, size = 32) {
   const frameObj = SHOP.frames.find(f => f.id === u.frame) || SHOP.frames[0];
   const initials = u.login.substring(0, 2).toUpperCase();
@@ -694,7 +682,6 @@ function switchNav(target) {
   else if (target === 'profile') renderProfileView(main, u);
 }
 
-/* Markets View */
 function renderMarketView(container) {
   container.className = 'content-area page';
 
@@ -706,7 +693,7 @@ function renderMarketView(container) {
     <div class="padding-box">
       <div class="market-header-stats">
         <div class="ticker-card">
-          <div class="title">Доминирование BTC</div>
+          <div class="title">Доминирование</div>
           <div class="val mono" style="color:var(--blue);">54.2%</div>
         </div>
         <div class="ticker-card">
@@ -720,8 +707,8 @@ function renderMarketView(container) {
       </div>
 
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-        <h3 style="font-weight:900; font-size:18px;">Рынки в реальном времени</h3>
-        <span style="font-size:11px; font-weight:700; color:var(--text-muted);">Биржа Treadems Pro</span>
+        <h3 style="font-weight:900; font-size:18px;">Рынки</h3>
+        <span style="font-size:11px; font-weight:700; color:var(--text-muted);">Treadems Mobile</span>
       </div>
       <div class="market-list" id="market-rows-container"></div>
     </div>
@@ -758,33 +745,17 @@ function renderMarketRows() {
   }).join('');
 }
 
-/* Clicking ANY coin in Markets dynamically changes the active trade asset! */
 function openTradeForSymbol(s) {
   activeSym = s;
   switchNav('trade');
 }
 
-/* Trade View with Coin Switcher */
 function renderTradeView(container, u) {
   const owned = u.portfolio[activeSym] || 0;
   const curP = ASSETS[activeSym].price;
   const hist = marketHistory[activeSym];
   const min24 = Math.min(...hist).toFixed(2);
   const max24 = Math.max(...hist).toFixed(2);
-
-  let asksHTML = '';
-  for (let i = 4; i >= 1; i--) {
-    const askP = curP + (i * (curP * 0.0008));
-    const size = (Math.random() * 2 + 0.1).toFixed(3);
-    asksHTML += `<div class="ob-row ob-ask"><span>$${askP.toFixed(2)}</span><span>${size}</span></div>`;
-  }
-
-  let bidsHTML = '';
-  for (let i = 1; i <= 4; i++) {
-    const bidP = curP - (i * (curP * 0.0008));
-    const size = (Math.random() * 2 + 0.1).toFixed(3);
-    bidsHTML += `<div class="ob-row ob-bid"><span>$${bidP.toFixed(2)}</span><span>${size}</span></div>`;
-  }
 
   const coinOptions = Object.keys(ASSETS).map(s => 
     `<option value="${s}" ${s === activeSym ? 'selected' : ''}>${s}/USD</option>`
@@ -794,7 +765,7 @@ function renderTradeView(container, u) {
   container.innerHTML = `
     <div class="terminal-bar">
       <div>
-        <select onchange="changeSymbol(this.value)" style="background:var(--bg-panel); color:var(--text-main); border:1px solid var(--border); border-radius:6px; font-weight:800; font-size:14px; padding:2px 6px; outline:none; cursor:pointer;">
+        <select onchange="changeSymbol(this.value)" style="background:var(--bg-panel); color:var(--text-main); border:1px solid var(--border); border-radius:6px; font-weight:800; font-size:14px; padding:4px 8px; outline:none;">
           ${coinOptions}
         </select>
         <div class="mono" style="font-size:13.5px; font-weight:800; color:${ASSETS[activeSym].color}; margin-top:2px;" id="tr-price">${fmtUSD(curP)}</div>
@@ -813,12 +784,6 @@ function renderTradeView(container, u) {
     <div class="terminal-main-layout">
       <div class="chart-box">
         <canvas id="chart-canvas"></canvas>
-      </div>
-      <div class="order-book">
-        <div style="font-size:9.5px; font-weight:800; color:var(--text-muted); text-align:center; margin-bottom:2px;">СТАКАН (OB)</div>
-        ${asksHTML}
-        <div class="ob-spread mono">$${curP.toFixed(2)}</div>
-        ${bidsHTML}
       </div>
     </div>
 
@@ -851,7 +816,7 @@ function renderTradeView(container, u) {
     </div>
   `;
 
-  setTimeout(() => drawChart(), 30);
+  setTimeout(() => drawChart(), 50);
 }
 
 function changeSymbol(newSym) {
@@ -933,7 +898,6 @@ function doTrade(type) {
   renderHeader();
 }
 
-/* Portfolio View */
 function renderPortfolioView(container, u) {
   container.className = 'content-area page padding-box';
   let cryptoVal = 0, totalCost = 0;
@@ -993,7 +957,6 @@ function renderPortfolioView(container, u) {
   `;
 }
 
-/* Profile & Cosmetics View */
 function renderProfileView(container, u) {
   container.className = 'content-area page padding-box';
   const prefObj = SHOP.prefixes.find(p => p.id === u.prefix) || SHOP.prefixes[0];
@@ -1003,7 +966,7 @@ function renderProfileView(container, u) {
 
   container.innerHTML = `
     <div style="display:flex; align-items:center; gap:14px; margin-bottom:16px;">
-      <div onclick="document.getElementById('avatar-input').click()" style="cursor:pointer;" title="Сменить аватар">
+      <div onclick="document.getElementById('avatar-input').click()" style="cursor:pointer;">
         ${renderAvatarHTML(u, 54)}
       </div>
       <div style="flex:1;">
@@ -1015,7 +978,7 @@ function renderProfileView(container, u) {
         </div>
         <div style="font-size:11.5px; color:var(--text-muted); margin-top:2px;">Уровень ${u.level} (${u.xp} / ${nextXP} XP)</div>
         <div style="width:100%; height:4px; background:var(--bg-input); border-radius:4px; margin-top:6px; overflow:hidden;">
-          <div style="width:${xpPct}%; height:100%; background:var(--blue); border-radius:4px; transition:width 0.3s ease;"></div>
+          <div style="width:${xpPct}%; height:100%; background:var(--blue); border-radius:4px;"></div>
         </div>
       </div>
     </div>
@@ -1049,9 +1012,6 @@ function renderProfileView(container, u) {
 function switchShopTab(tab) {
   sounds.play('click');
   shopSubTab = tab;
-  document.querySelectorAll('.shop-tab').forEach((el, i) => {
-    el.classList.toggle('active', ['frames', 'nicks', 'prefixes'][i] === tab);
-  });
   renderShopItems();
 }
 
@@ -1163,7 +1123,8 @@ function logout() {
   document.getElementById('auth-screen').classList.remove('hidden');
 }
 
-/* App Entry Point */
+window.addEventListener('resize', () => { if (currentNav === 'trade') drawChart(); });
+
 if (DB.session && DB.users[DB.session]) {
   startApp();
 } else {
