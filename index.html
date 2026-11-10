@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0b0e14">
-<title>Treadems — Mobile Crypto Trading Simulator</title>
+<title>Treadems.gg</title>
 
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%232962ff'/><path d='M8 22L14 14L18 18L24 10M24 10H19M24 10V15' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/></svg>">
 
@@ -16,9 +16,6 @@
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <style>
-/* =========================================================================
-   1. BASE STYLES & iOS RETINA OPTIMIZED DARK THEME
-   ========================================================================= */
 :root {
   --bg-main: #0b0e14;
   --bg-card: #141822;
@@ -74,7 +71,6 @@ html, body {
 
 .mono { font-family: 'JetBrains Mono', monospace; }
 .hidden { display: none !important; }
-
 ::-webkit-scrollbar { width: 0px; height: 0px; }
 
 @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
@@ -89,17 +85,17 @@ html, body {
 
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-  padding: 10px 16px; border-radius: var(--radius-sm); font-size: 13.5px; font-weight: 700;
+  padding: 8px 12px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 700;
   background: var(--bg-panel); border: 1px solid var(--border); color: var(--text-main);
   cursor: pointer; transition: transform 0.1s ease, opacity 0.1s ease;
   will-change: transform; white-space: nowrap; outline: none;
+  touch-action: manipulation;
 }
 .btn:active { transform: scale(0.95); opacity: 0.85; }
 .btn.primary { background: var(--blue); border: none; color: #fff; box-shadow: 0 4px 16px rgba(41,98,255,0.35); }
 .btn.buy { background: var(--green); border: none; color: #000; font-weight: 800; box-shadow: 0 4px 16px rgba(14,203,129,0.3); }
 .btn.sell { background: var(--red); border: none; color: #fff; font-weight: 800; box-shadow: 0 4px 16px rgba(246,70,93,0.3); }
-.btn.gold { background: var(--gold); border: none; color: #000; font-weight: 800; box-shadow: 0 4px 16px rgba(240,185,11,0.3); }
-.btn.sm { padding: 6px 10px; font-size: 12px; }
+.btn.sm { padding: 5px 8px; font-size: 11px; }
 .btn.full { width: 100%; }
 .btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
 
@@ -114,7 +110,7 @@ html, body {
 .field { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
 .field label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
 
-/* Layout & Screens */
+/* Screens & Layout */
 .auth-wrapper {
   position: fixed; inset: 0; z-index: 999;
   display: grid; place-items: center; padding: 18px;
@@ -147,19 +143,20 @@ html, body {
 }
 .user-pill { display: flex; align-items: center; gap: 10px; }
 .lvl-badge { padding: 2px 6px; border-radius: 6px; background: var(--gold-bg); color: var(--gold); font-size: 10.5px; font-weight: 800; }
-.cash-display { font-size: 14px; font-weight: 800; color: var(--green); }
+.currencies-display { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+.cash-display { font-size: 15px; font-weight: 800; color: var(--green); }
 
 .content-area { flex: 1; height: calc(100dvh - var(--header-h) - var(--nav-h)); overflow-y: auto; position: relative; -webkit-overflow-scrolling: touch; }
 
 .bottom-nav {
   height: var(--nav-h); flex-shrink: 0;
-  display: grid; grid-template-columns: repeat(4, 1fr);
+  display: grid; grid-template-columns: repeat(5, 1fr);
   padding-bottom: env(safe-area-inset-bottom, 0px);
   background: var(--bg-card); border-top: 1px solid var(--border); z-index: 100;
 }
 .nav-item {
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
-  color: var(--text-muted); font-size: 10.5px; font-weight: 700; cursor: pointer;
+  color: var(--text-muted); font-size: 10px; font-weight: 700; cursor: pointer;
 }
 .nav-item.active { color: var(--blue); }
 
@@ -187,7 +184,6 @@ html, body {
 .coin-chg.up { color: var(--green); background: var(--green-bg); }
 .coin-chg.down { color: var(--red); background: var(--red-bg); }
 
-/* Full-Screen Canvas Chart */
 .terminal-screen { display: flex; flex-direction: column; height: 100%; }
 .terminal-bar { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--bg-main); border-bottom: 1px solid var(--border); }
 .tf-selector { display: flex; gap: 4px; }
@@ -219,10 +215,31 @@ html, body {
 .av-inner { width: 100%; height: 100%; border-radius: 50%; overflow: hidden; background: var(--bg-panel); display: grid; place-items: center; z-index: 2; font-weight: 800; font-size: 13px; }
 .av-inner img { width: 100%; height: 100%; object-fit: cover; }
 
-#toast-container { position: fixed; top: 12px; left: 14px; right: 14px; z-index: 1000; pointer-events: none; display: flex; flex-direction: column; gap: 6px; }
+.lang-select-accent {
+  background: transparent; border: 1px solid var(--border); border-radius: 6px;
+  color: var(--text-muted); font-size: 11px; font-weight: 700; padding: 2px 6px; outline: none; cursor: pointer;
+}
+
+.tutorial-overlay {
+  position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,0.85);
+  display: grid; place-items: center; padding: 20px; animation: fadeIn 0.2s ease;
+}
+.tutorial-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
+  padding: 24px; max-width: 340px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+}
+
+#toast-container { position: fixed; top: 12px; left: 14px; right: 14px; z-index: 3000; pointer-events: none; display: flex; flex-direction: column; gap: 6px; }
 .toast { padding: 10px 14px; border-radius: var(--radius-sm); font-size: 12.5px; font-weight: 700; background: var(--bg-panel); border: 1px solid var(--border); color: var(--text-main); box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 8px; }
 .toast.ok { border-color: var(--green); color: var(--green); }
 .toast.err { border-color: var(--red); color: var(--red); }
+
+/* Daily Tasks Styles */
+.daily-header { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; margin-bottom: 12px; }
+.task-card-list { display: flex; flex-direction: column; gap: 8px; }
+.task-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.task-card.completed { border-color: var(--green); background: rgba(14,203,129,0.05); }
+.veteran-badge { color: var(--gold); font-weight: 900; font-size: 11px; letter-spacing: 0.5px; text-transform: uppercase; margin-top: 2px; display: inline-flex; align-items: center; gap: 4px; }
 </style>
 </head>
 <body>
@@ -233,8 +250,8 @@ html, body {
     <div class="brand-icon">
       <svg class="svg-icon" style="width:26px; height:26px;" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
     </div>
-    <h2 style="font-size:20px; font-weight:900;">Treadems</h2>
-    <p style="font-size:12px; color:var(--text-muted); margin-top:2px;">Mobile Crypto Exchange</p>
+    <h2 id="t-brand-title" style="font-size:20px; font-weight:900;">Treadems</h2>
+    <p id="t-brand-sub" style="font-size:12px; color:var(--text-muted); margin-top:2px;">Pro Trading Simulator</p>
 
     <div class="auth-tabs">
       <button class="auth-tab active" id="tab-login" onclick="setAuthTab('login')">Вход</button>
@@ -243,21 +260,21 @@ html, body {
 
     <form id="auth-form" onsubmit="handleAuth(event)">
       <div class="field">
-        <label>Логин</label>
+        <label id="lbl-login">Логин</label>
         <input type="text" id="auth-login" class="inp" placeholder="Ваш логин" required maxlength="16" autocomplete="off">
       </div>
       <div class="field">
-        <label>Пароль</label>
+        <label id="lbl-pass">Пароль</label>
         <input type="password" id="auth-pass" class="inp" placeholder="••••••••" required>
       </div>
 
       <div id="reg-box" class="hidden">
         <div class="field">
-          <label>Повторите пароль</label>
+          <label id="lbl-pass2">Повторите пароль</label>
           <input type="password" id="auth-pass2" class="inp" placeholder="••••••••">
         </div>
         <div class="field">
-          <label>Капча</label>
+          <label id="lbl-captcha">Капча</label>
           <div class="captcha-box">
             <canvas id="captcha-canvas" width="140" height="38"></canvas>
             <button type="button" class="btn sm" onclick="initCaptcha()">
@@ -284,7 +301,7 @@ html, body {
         <div class="lvl-badge" id="hdr-lvl">LVL 1</div>
       </div>
     </div>
-    <div style="display:flex; align-items:center; gap:8px;">
+    <div class="currencies-display">
       <div class="cash-display mono" id="hdr-cash">$0.00</div>
     </div>
   </header>
@@ -294,19 +311,23 @@ html, body {
   <nav class="bottom-nav">
     <div class="nav-item active" onclick="switchNav('market')">
       <svg class="svg-icon" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
-      <span>Рынки</span>
+      <span id="nav-markets">Рынки</span>
     </div>
     <div class="nav-item" onclick="switchNav('trade')">
       <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-      <span>Торговля</span>
+      <span id="nav-trade">Торговля</span>
+    </div>
+    <div class="nav-item" onclick="switchNav('tasks')">
+      <svg class="svg-icon" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      <span id="nav-tasks">Задания</span>
     </div>
     <div class="nav-item" onclick="switchNav('portfolio')">
       <svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 12V7H3v5"/><path d="M3 12v7h18v-7"/><path d="M12 12v.01"/></svg>
-      <span>Портфель</span>
+      <span id="nav-portfolio">Портфель</span>
     </div>
     <div class="nav-item" onclick="switchNav('profile')">
       <svg class="svg-icon" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      <span>Профиль</span>
+      <span id="nav-profile">Профиль</span>
     </div>
   </nav>
 </div>
@@ -315,12 +336,40 @@ html, body {
 <input type="file" id="avatar-input" accept="image/*" class="hidden" onchange="uploadAvatar(event)">
 
 <script>
+const LANGS = {
+  ru: {
+    markets: 'Рынки', trade: 'Торговля', tasks: 'Задания', portfolio: 'Портфель', profile: 'Профиль',
+    login: 'Вход', register: 'Регистрация', username: 'Логин', passw: 'Пароль', pass2: 'Повторите пароль',
+    captcha: 'Капча', enterCode: 'КОД', btnEnter: 'Войти', btnReg: 'Зарегистрироваться',
+    capital: 'Капитал', pnl: 'PnL Сделок', openPos: 'Открытые Позиции', noPos: 'Нет активных позиций',
+    promoTitle: 'Промокод', promoInp: 'ВВЕДИТЕ ПРОМОКОД', promoBtn: 'Применить', shopTitle: 'Косметический Магазин',
+    frames: 'Рамки', nicks: 'Цвета ников', prefixes: 'Префиксы', logout: 'Выйти из аккаунта',
+    buy: 'Купить', sell: 'Продать', available: 'Доступно', balance: 'Баланс', qty: 'Количество', cost: 'Стоимость',
+    tutorialTitle: 'Добро пожаловать в Treadems!',
+    tutorialText: 'Выполняйте ежедневные торговые задания, которые обновляются каждый день, и получайте статус ВЕТЕРАН!',
+    tutorialBtn: 'Начать торговлю'
+  },
+  en: {
+    markets: 'Markets', trade: 'Trade', tasks: 'Tasks', portfolio: 'Portfolio', profile: 'Profile',
+    login: 'Login', register: 'Register', username: 'Username', passw: 'Password', pass2: 'Confirm Password',
+    captcha: 'Captcha', enterCode: 'CODE', btnEnter: 'Sign In', btnReg: 'Sign Up',
+    capital: 'Capital', pnl: 'Trade PnL', openPos: 'Open Positions', noPos: 'No active positions',
+    promoTitle: 'Promo Code', promoInp: 'ENTER PROMO CODE', promoBtn: 'Apply', shopTitle: 'Cosmetics Shop',
+    frames: 'Frames', nicks: 'Nick Colors', prefixes: 'Prefixes', logout: 'Log Out',
+    buy: 'Buy', sell: 'Sell', available: 'Available', balance: 'Balance', qty: 'Quantity', cost: 'Total',
+    tutorialTitle: 'Welcome to Treadems!',
+    tutorialText: 'Complete daily trading tasks that reset every 24 hours to earn rewards and the VETERAN title!',
+    tutorialBtn: 'Start Trading'
+  }
+};
+
+let currentLang = localStorage.getItem('treadems_lang') || 'ru';
+function t(key) { return (LANGS[currentLang] && LANGS[currentLang][key]) ? LANGS[currentLang][key] : LANGS['ru'][key]; }
+
 class SoundFx {
   constructor() { this.ctx = null; }
   init() { 
-    try {
-      if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); 
-    } catch(e){}
+    try { if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e){}
   }
   play(type) {
     this.init();
@@ -330,23 +379,17 @@ class SoundFx {
       const gain = this.ctx.createGain();
       osc.connect(gain); gain.connect(this.ctx.destination);
       const now = this.ctx.currentTime;
-
       if (type === 'buy') {
-        osc.frequency.setValueAtTime(440, now);
-        osc.frequency.exponentialRampToValueAtTime(880, now + 0.12);
-        gain.gain.setValueAtTime(0.15, now);
-        gain.gain.linearRampToValueAtTime(0.01, now + 0.12);
+        osc.frequency.setValueAtTime(440, now); osc.frequency.exponentialRampToValueAtTime(880, now + 0.12);
+        gain.gain.setValueAtTime(0.15, now); gain.gain.linearRampToValueAtTime(0.01, now + 0.12);
         osc.start(now); osc.stop(now + 0.12);
       } else if (type === 'sell') {
-        osc.frequency.setValueAtTime(600, now);
-        osc.frequency.exponentialRampToValueAtTime(300, now + 0.12);
-        gain.gain.setValueAtTime(0.15, now);
-        gain.gain.linearRampToValueAtTime(0.01, now + 0.12);
+        osc.frequency.setValueAtTime(600, now); osc.frequency.exponentialRampToValueAtTime(300, now + 0.12);
+        gain.gain.setValueAtTime(0.15, now); gain.gain.linearRampToValueAtTime(0.01, now + 0.12);
         osc.start(now); osc.stop(now + 0.12);
       } else if (type === 'click') {
         osc.frequency.setValueAtTime(800, now);
-        gain.gain.setValueAtTime(0.05, now);
-        gain.gain.linearRampToValueAtTime(0.01, now + 0.04);
+        gain.gain.setValueAtTime(0.05, now); gain.gain.linearRampToValueAtTime(0.01, now + 0.04);
         osc.start(now); osc.stop(now + 0.04);
       }
     } catch(e){}
@@ -377,46 +420,41 @@ const SHOP = {
     { id: 'fr_cyan', name: 'Кибер Циан', price: 5000, style: 'border:2px solid #00f0ff; box-shadow:0 0 10px #00f0ff' },
     { id: 'fr_gold', name: 'Золотой Слиток', price: 12000, style: 'border:2px solid #f0b90b; box-shadow:0 0 12px #f0b90b' },
     { id: 'fr_green', name: 'Матрикс', price: 18000, style: 'border:2px solid #0ecb81; box-shadow:0 0 12px #0ecb81' },
-    { id: 'fr_red', name: 'Огненный Булл', price: 25000, style: 'border:2px solid #f6465d; box-shadow:0 0 14px #f6465d' },
-    { id: 'fr_purple', name: 'Королевский', price: 40000, style: 'border:2px solid #9d56ff; box-shadow:0 0 14px #9d56ff' },
-    { id: 'fr_rainbow', name: 'Градиент Про', price: 75000, style: 'border:2px solid #ff007a; box-shadow:0 0 16px rgba(255,0,122,0.8)' },
-    { id: 'fr_diamond', name: 'Алмазный Блеск', price: 120000, style: 'border:2px solid #00ffff; box-shadow:0 0 20px rgba(0,255,255,0.9)' },
-    { id: 'fr_plasma', name: 'Плазменный Шторм', price: 200000, style: 'border:2px solid #9d56ff; box-shadow:0 0 25px rgba(157,86,255,1)' }
+    { id: 'fr_red', name: 'Огненный Булл', price: 25000, style: 'border:2px solid #f6465d; box-shadow:0 0 14px #f6465d' }
   ],
   nicks: [
     { id: 'nk_base', name: 'Стандарт', price: 0, color: 'var(--text-main)' },
     { id: 'nk_blue', name: 'Неон Синий', price: 3000, color: '#2962ff' },
     { id: 'nk_cyan', name: 'Циан', price: 4500, color: '#00f0ff' },
     { id: 'nk_green', name: 'Трейдер Профи', price: 7000, color: '#0ecb81' },
-    { id: 'nk_gold', name: 'VIP Gold', price: 15000, color: '#f0b90b' },
-    { id: 'nk_purple', name: 'Пурпурный', price: 22000, color: '#9d56ff' },
-    { id: 'nk_red', name: 'Медвежий Красный', price: 30000, color: '#f6465d' },
-    { id: 'nk_neonpink', name: 'Неоновый Розовый', price: 45000, color: '#ff007a' },
-    { id: 'nk_cyberyellow', name: 'Кибер Желтый', price: 60000, color: '#ffe600' }
+    { id: 'nk_gold', name: 'VIP Gold', price: 15000, color: '#f0b90b' }
   ],
   prefixes: [
     { id: 'pref_none', name: 'Без префикса', price: 0, label: '' },
     { id: 'pref_kit', name: 'KIT', price: 5000, label: '[KIT]' },
-    { id: 'pref_treder', name: 'TREDER', price: 12000, label: '[TREDER]' },
     { id: 'pref_vip', name: 'VIP', price: 25000, label: '[VIP]' },
-    { id: 'pref_preld', name: 'PRELD', price: 50000, label: '[PRELD]' },
-    { id: 'pref_prime', name: 'PRIME', price: 100000, label: '[PRIME]' },
-    { id: 'pref_prefender', name: 'PREFENDER', price: 250000, label: '[PREFENDER]' }
+    { id: 'pref_treder', name: 'TREDER', price: 35000, label: '[TREDER]' }
   ]
 };
 
 const PROMOS = {
-  'GAMEPLAY72': { cash: 250000, prefix: 'pref_prefender', msg: '🔥 МЕГА-БОНУС! +$250,000 и префикс [PREFENDER]!' },
+  'GAMEPLAY72': { cash: 250000, msg: '+ $250,000 бонуса!' },
   'PUPOVICH3': { cash: 50000, msg: '+ $50,000 на счёт!' },
-  'MEDKID': { cash: 35000, msg: '+ $35,000 бонуса!' },
-  'ZIKAS123': { cash: 20000, msg: '+ $20,000 на счёт!' },
-  'START2026': { cash: 10000, msg: '+ $10,000 стартового капитала!' },
-  'TREADEMS': { cash: 15000, msg: '+ $15,000 промо!' }
+  'START2026': { cash: 10000, msg: '+ $10,000 стартового капитала!' }
 };
 
+// Daily Tasks Configuration
+const DAILY_TASKS_CONFIG = [
+  { id: 1, title: 'Первые шаги', desc: 'Сделать 3 торговые сделки', type: 'trades', target: 3, reward: 2500 },
+  { id: 2, title: 'Активный трейдер', desc: 'Достичь дневного объема $10,000', type: 'volume', target: 10000, reward: 5000 },
+  { id: 3, title: 'Опытный инвестор', desc: 'Сделать 10 торговых сделок', type: 'trades', target: 10, reward: 8000 },
+  { id: 4, title: 'Крупный игрок', desc: 'Достичь дневного объема $50,000', type: 'volume', target: 50000, reward: 15000 },
+  { id: 5, title: 'Мастер рынка', desc: 'Достичь дневного объема $150,000', type: 'volume', target: 150000, reward: 35000 }
+];
+
 let DB = {
-  users: JSON.parse(localStorage.getItem('treadems_users_v10') || '{}'),
-  session: localStorage.getItem('treadems_session_v10') || null
+  users: JSON.parse(localStorage.getItem('treadems_users_v17') || '{}'),
+  session: localStorage.getItem('treadems_session_v17') || null
 };
 
 let marketHistory = {};
@@ -432,13 +470,33 @@ Object.keys(ASSETS).forEach(s => {
   marketHistory[s] = Array.from({length: 50}, () => base + (Math.random() * (base * 0.015) - (base * 0.0075)));
 });
 
-function saveDB() {
-  localStorage.setItem('treadems_users_v10', JSON.stringify(DB.users));
-  if (DB.session) localStorage.setItem('treadems_session_v10', DB.session);
-  else localStorage.removeItem('treadems_session_v10');
+function getTodayString() {
+  const d = new Date();
+  return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
 }
 
-function getUser() { return DB.session ? DB.users[DB.session] : null; }
+function checkAndResetDaily(u) {
+  const today = getTodayString();
+  if (u.lastDailyDate !== today) {
+    u.lastDailyDate = today;
+    u.dailyVolume = 0;
+    u.dailyTrades = 0;
+    u.dailyCompleted = [];
+    saveDB();
+  }
+}
+
+function saveDB() {
+  localStorage.setItem('treadems_users_v17', JSON.stringify(DB.users));
+  if (DB.session) localStorage.setItem('treadems_session_v17', DB.session);
+  else localStorage.removeItem('treadems_session_v17');
+}
+
+function getUser() { 
+  const u = DB.session ? DB.users[DB.session] : null; 
+  if (u) checkAndResetDaily(u);
+  return u;
+}
 function fmtUSD(v) { return '$' + Number(v || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 function getReqXP(lvl) { return Math.floor(100 * Math.pow(lvl, 1.3)); }
 
@@ -462,14 +520,13 @@ function addXP(u, amount) {
     leveled = true;
   }
   if (leveled) {
-    toast(`Новый уровень: ${u.level}!`, 'ok');
-    if (typeof confetti === 'function') confetti({ particleCount: 70, origin: { y: 0.7 } });
+    toast(`Новый уровень ${u.level}!`, 'ok');
+    if (typeof confetti === 'function') confetti({ particleCount: 80, origin: { y: 0.7 } });
   }
   saveDB();
   renderHeader();
 }
 
-/* iOS Dynamic Smooth Movement Engine */
 setInterval(() => {
   marketVol24 += Math.floor(Math.random() * 1200);
   Object.keys(ASSETS).forEach(s => {
@@ -508,7 +565,6 @@ function smoothPriceLoop() {
 }
 requestAnimationFrame(smoothPriceLoop);
 
-/* Canvas iOS High-DPI Retina Renderer */
 function drawChart() {
   const canvas = document.getElementById('chart-canvas');
   if (!canvas) return;
@@ -579,12 +635,28 @@ function drawChart() {
   ctx.stroke();
 }
 
+function updateUILabels() {
+  document.getElementById('tab-login').textContent = t('login');
+  document.getElementById('tab-reg').textContent = t('register');
+  document.getElementById('lbl-login').textContent = t('username');
+  document.getElementById('lbl-pass').textContent = t('passw');
+  document.getElementById('lbl-pass2').textContent = t('pass2');
+  document.getElementById('lbl-captcha').textContent = t('captcha');
+  document.getElementById('auth-btn').textContent = authMode === 'login' ? t('btnEnter') : t('btnReg');
+  
+  document.getElementById('nav-markets').textContent = t('markets');
+  document.getElementById('nav-trade').textContent = t('trade');
+  document.getElementById('nav-tasks').textContent = t('tasks');
+  document.getElementById('nav-portfolio').textContent = t('portfolio');
+  document.getElementById('nav-profile').textContent = t('profile');
+}
+
 function setAuthTab(mode) {
   authMode = mode;
   document.getElementById('tab-login').classList.toggle('active', mode === 'login');
   document.getElementById('tab-reg').classList.toggle('active', mode === 'register');
   document.getElementById('reg-box').classList.toggle('hidden', mode === 'login');
-  document.getElementById('auth-btn').textContent = mode === 'login' ? 'Войти' : 'Зарегистрироваться';
+  document.getElementById('auth-btn').textContent = mode === 'login' ? t('btnEnter') : t('btnReg');
   document.getElementById('auth-err').textContent = '';
   if (mode === 'register') initCaptcha();
 }
@@ -615,7 +687,8 @@ function handleAuth(e) {
       login, pass, cash: 10000, level: 1, xp: 0, 
       frame: 'fr_base', nickColor: 'nk_base', prefix: 'pref_none',
       inventory: { frames: ['fr_base'], nicks: ['nk_base'], prefixes: ['pref_none'] },
-      customAvatar: null, portfolio: {}, buyPrices: {} 
+      lastDailyDate: getTodayString(), dailyVolume: 0, dailyTrades: 0, dailyCompleted: [], totalDailyCount: 0, isVeteran: false,
+      usedPromos: [], customAvatar: null, portfolio: {}, buyPrices: {}, tutorialShown: false 
     };
     toast('Регистрация успешна!', 'ok');
   } else {
@@ -634,13 +707,41 @@ function startApp() {
   document.getElementById('app-screen').classList.remove('hidden');
   renderHeader();
   switchNav('market');
+
+  const u = getUser();
+  if (u && !u.tutorialShown) {
+    showTutorial();
+  }
+}
+
+function showTutorial() {
+  const div = document.createElement('div');
+  div.className = 'tutorial-overlay';
+  div.innerHTML = `
+    <div class="tutorial-card">
+      <div class="brand-icon" style="margin:0 auto 12px auto;"><svg class="svg-icon" style="width:26px; height:26px;" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg></div>
+      <h3 style="font-weight:900; font-size:18px; margin-bottom:8px;">${t('tutorialTitle')}</h3>
+      <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:18px; line-height:1.5;">${t('tutorialText')}</p>
+      <button class="btn primary full" onclick="closeTutorial()">${t('tutorialBtn')}</button>
+    </div>
+  `;
+  document.body.appendChild(div);
+}
+
+function closeTutorial() {
+  const u = getUser();
+  if (u) {
+    u.tutorialShown = true;
+    saveDB();
+  }
+  const overlay = document.querySelector('.tutorial-overlay');
+  if (overlay) overlay.remove();
 }
 
 function renderAvatarHTML(u, size = 32) {
   const frameObj = SHOP.frames.find(f => f.id === u.frame) || SHOP.frames[0];
   const initials = u.login.substring(0, 2).toUpperCase();
   const inner = u.customAvatar ? `<img src="${u.customAvatar}">` : `<span>${initials}</span>`;
-
   return `
     <div class="av-box" style="width:${size}px; height:${size}px;">
       <div class="av-ring" style="${frameObj.style}"></div>
@@ -663,6 +764,7 @@ function renderHeader() {
   const displayName = (prefObj.label ? prefObj.label + ' ' : '') + u.login;
   unameEl.textContent = displayName;
   unameEl.style.color = nickObj.color;
+  updateUILabels();
 }
 
 function switchNav(target) {
@@ -670,7 +772,7 @@ function switchNav(target) {
   currentNav = target;
   document.querySelectorAll('.nav-item').forEach(el => {
     el.classList.remove('active');
-    if (el.getAttribute('onclick').includes(target)) el.classList.add('active');
+    if (el.getAttribute('onclick') && el.getAttribute('onclick').includes(target)) el.classList.add('active');
   });
 
   const main = document.getElementById('main-view');
@@ -678,13 +780,13 @@ function switchNav(target) {
 
   if (target === 'market') renderMarketView(main);
   else if (target === 'trade') renderTradeView(main, u);
+  else if (target === 'tasks') renderTasksView(main, u);
   else if (target === 'portfolio') renderPortfolioView(main, u);
   else if (target === 'profile') renderProfileView(main, u);
 }
 
 function renderMarketView(container) {
   container.className = 'content-area page';
-
   const btcP = ASSETS.BTC.price;
   const btcHist = marketHistory.BTC;
   const btcPct = ((btcP - btcHist[0]) / btcHist[0] * 100).toFixed(2);
@@ -693,22 +795,22 @@ function renderMarketView(container) {
     <div class="padding-box">
       <div class="market-header-stats">
         <div class="ticker-card">
-          <div class="title">Доминирование</div>
+          <div class="title">BTC Dom</div>
           <div class="val mono" style="color:var(--blue);">54.2%</div>
         </div>
         <div class="ticker-card">
-          <div class="title">Объем 24ч</div>
+          <div class="title">Vol 24h</div>
           <div class="val mono" id="market-vol-val">$${(marketVol24 / 1000000).toFixed(2)}M</div>
         </div>
         <div class="ticker-card">
-          <div class="title">Тренд BTC</div>
+          <div class="title">BTC Trend</div>
           <div class="val mono" style="color:${btcPct >= 0 ? 'var(--green)' : 'var(--red)'};">${btcPct >= 0 ? '+' : ''}${btcPct}%</div>
         </div>
       </div>
 
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-        <h3 style="font-weight:900; font-size:18px;">Рынки</h3>
-        <span style="font-size:11px; font-weight:700; color:var(--text-muted);">Treadems Mobile</span>
+        <h3 style="font-weight:900; font-size:18px;">${t('markets')}</h3>
+        <span style="font-size:11px; font-weight:700; color:var(--text-muted);">Treadems Pro</span>
       </div>
       <div class="market-list" id="market-rows-container"></div>
     </div>
@@ -728,7 +830,7 @@ function renderMarketRows() {
     const isUp = pct >= 0;
 
     return `
-      <div class="coin-row" onclick="openTradeForSymbol('${s}')">
+      <div class="coin-row" onclick="openTradeForSymbol('${s}')" ontouchend="openTradeForSymbol('${s}')">
         <div class="coin-left">
           <div class="coin-icon" style="background:${a.color};">${s.substring(0,2)}</div>
           <div>
@@ -771,8 +873,8 @@ function renderTradeView(container, u) {
         <div class="mono" style="font-size:13.5px; font-weight:800; color:${ASSETS[activeSym].color}; margin-top:2px;" id="tr-price">${fmtUSD(curP)}</div>
       </div>
       <div style="display:flex; gap:10px; font-size:10px; color:var(--text-muted); text-align:right;">
-        <div>24h Мин:<br><b class="mono" style="color:var(--text-main);">$${min24}</b></div>
-        <div>24h Макс:<br><b class="mono" style="color:var(--text-main);">$${max24}</b></div>
+        <div>24h Min:<br><b class="mono" style="color:var(--text-main);">$${min24}</b></div>
+        <div>24h Max:<br><b class="mono" style="color:var(--text-main);">$${max24}</b></div>
       </div>
       <div class="tf-selector">
         <button class="tf-btn active">1M</button>
@@ -789,29 +891,29 @@ function renderTradeView(container, u) {
 
     <div class="trade-panel-bottom">
       <div style="display:flex; justify-content:space-between; font-size:11.5px; color:var(--text-muted);">
-        <span>Доступно: <b class="mono" style="color:var(--text-main);">${fmtUSD(u.cash)}</b></span>
-        <span>Баланс: <b class="mono" style="color:var(--text-main);">${owned.toFixed(4)} ${activeSym}</b></span>
+        <span>${t('available')}: <b class="mono" style="color:var(--text-main);">${fmtUSD(u.cash)}</b></span>
+        <span>${t('balance')}: <b class="mono" style="color:var(--text-main);">${owned.toFixed(4)} ${activeSym}</b></span>
       </div>
 
       <div class="field" style="margin-bottom:0;">
-        <input type="number" id="trade-qty" class="inp mono" placeholder="Количество" step="any" oninput="calcTradeTotal()">
+        <input type="number" id="trade-qty" class="inp mono" placeholder="${t('qty')}" step="any" oninput="calcTradeTotal()">
       </div>
 
       <div class="pct-btns">
-        <button class="btn sm" onclick="setQuickPct(0.25)">25%</button>
-        <button class="btn sm" onclick="setQuickPct(0.50)">50%</button>
-        <button class="btn sm" onclick="setQuickPct(0.75)">75%</button>
-        <button class="btn sm" onclick="setQuickPct(1.00)">100%</button>
+        <button class="btn sm" onclick="setQuickPct(0.25)" ontouchend="setQuickPct(0.25)">25%</button>
+        <button class="btn sm" onclick="setQuickPct(0.50)" ontouchend="setQuickPct(0.50)">50%</button>
+        <button class="btn sm" onclick="setQuickPct(0.75)" ontouchend="setQuickPct(0.75)">75%</button>
+        <button class="btn sm" onclick="setQuickPct(1.00)" ontouchend="setQuickPct(1.00)">100%</button>
       </div>
 
       <div style="font-size:12px; display:flex; justify-content:space-between; margin-bottom:2px;">
-        <span style="color:var(--text-muted);">Стоимость:</span>
+        <span style="color:var(--text-muted);">${t('cost')}:</span>
         <b class="mono" id="trade-total-val">$0.00</b>
       </div>
 
       <div class="order-type-tabs">
-        <button class="btn buy full" onclick="doTrade('buy')">Купить ${activeSym}</button>
-        <button class="btn sell full" onclick="doTrade('sell')" ${owned <= 0 ? 'disabled' : ''}>Продать</button>
+        <button class="btn buy full" onclick="doTrade('buy')" ontouchend="doTrade('buy')">${t('buy')} ${activeSym}</button>
+        <button class="btn sell full" onclick="doTrade('sell')" ontouchend="doTrade('sell')" ${owned <= 0 ? 'disabled' : ''}>${t('sell')}</button>
       </div>
     </div>
   `;
@@ -874,6 +976,10 @@ function doTrade(type) {
     u.cash -= cost;
     u.portfolio[activeSym] = newQty;
     u.buyPrices[activeSym] = newAvg;
+    
+    u.dailyVolume = (u.dailyVolume || 0) + cost;
+    u.dailyTrades = (u.dailyTrades || 0) + 1;
+
     addXP(u, Math.max(5, Math.floor(cost / 40)));
     sounds.play('buy');
   } else {
@@ -884,6 +990,10 @@ function doTrade(type) {
     }
     u.cash += cost;
     u.portfolio[activeSym] = currQty - qty;
+
+    u.dailyVolume = (u.dailyVolume || 0) + cost;
+    u.dailyTrades = (u.dailyTrades || 0) + 1;
+
     if (u.portfolio[activeSym] <= 0.0001) {
       delete u.portfolio[activeSym];
       delete u.buyPrices[activeSym];
@@ -896,6 +1006,94 @@ function doTrade(type) {
   toast('Сделка проведена!', 'ok');
   renderTradeView(document.getElementById('main-view'), u);
   renderHeader();
+}
+
+/* DAILY TASKS CATEGORY */
+function renderTasksView(container, u) {
+  if (!u.dailyCompleted) u.dailyCompleted = [];
+
+  container.className = 'content-area page padding-box';
+  container.innerHTML = `
+    <div class="daily-header">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <h3 style="font-weight:900; font-size:16px;">Ежедневные задания</h3>
+          <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Обновляются каждые 24 часа</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="mono" style="font-weight:800; font-size:12px; color:var(--blue);">${u.dailyCompleted.length}/${DAILY_TASKS_CONFIG.length}</div>
+          <div style="font-size:10px; color:var(--text-muted);">Всего: ${u.totalDailyCount || 0}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="task-card-list">
+      ${DAILY_TASKS_CONFIG.map(task => {
+        const isDone = u.dailyCompleted.includes(task.id);
+        let curVal = task.type === 'trades' ? (u.dailyTrades || 0) : (u.dailyVolume || 0);
+        let canClaim = !isDone && curVal >= task.target;
+
+        let btnClass = 'btn sm';
+        let btnText = task.type === 'trades' ? `${curVal}/${task.target}` : `$${Math.floor(curVal/1000)}K/$${Math.floor(task.target/1000)}K`;
+        let disabledAttr = 'disabled';
+
+        if (isDone) {
+          btnText = 'Выполнено';
+          btnClass = 'btn sm buy';
+        } else if (canClaim) {
+          btnText = 'Забрать';
+          btnClass = 'btn sm primary';
+          disabledAttr = '';
+        }
+
+        return `
+          <div class="task-card ${isDone ? 'completed' : ''}">
+            <div>
+              <div style="font-weight:800; font-size:13px;">${task.title}</div>
+              <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">${task.desc}</div>
+              <div class="mono" style="font-size:11px; color:var(--green); font-weight:800; margin-top:3px;">+${fmtUSD(task.reward)}</div>
+            </div>
+            <button class="${btnClass}" onclick="claimDailyTask(${task.id})" ontouchend="claimDailyTask(${task.id})" ${disabledAttr}>
+              ${btnText}
+            </button>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+}
+
+function claimDailyTask(taskId) {
+  sounds.play('click');
+  const u = getUser();
+  if (!u.dailyCompleted) u.dailyCompleted = [];
+  if (u.dailyCompleted.includes(taskId)) return;
+
+  const task = DAILY_TASKS_CONFIG.find(t => t.id === taskId);
+  if (!task) return;
+
+  let curVal = task.type === 'trades' ? (u.dailyTrades || 0) : (u.dailyVolume || 0);
+  if (curVal < task.target) {
+    toast('Условие еще не выполнено!', 'err');
+    return;
+  }
+
+  u.dailyCompleted.push(taskId);
+  u.cash += task.reward;
+  u.totalDailyCount = (u.totalDailyCount || 0) + 1;
+  addXP(u, 30);
+
+  if (u.totalDailyCount >= 30 && !u.isVeteran) {
+    u.isVeteran = true;
+    toast('Получен постоянный статус ВЕТЕРАН!', 'ok');
+    if (typeof confetti === 'function') confetti({ particleCount: 150, origin: { y: 0.5 } });
+  } else {
+    toast(`Задание "${task.title}" выполнено! +${fmtUSD(task.reward)}`, 'ok');
+  }
+
+  saveDB();
+  renderHeader();
+  renderTasksView(document.getElementById('main-view'), u);
 }
 
 function renderPortfolioView(container, u) {
@@ -914,15 +1112,15 @@ function renderPortfolioView(container, u) {
   const pnl = cryptoVal - totalCost;
 
   container.innerHTML = `
-    <h3 style="font-weight:900; font-size:18px; margin-bottom:12px;">Мой Портфель</h3>
+    <h3 style="font-weight:900; font-size:18px; margin-bottom:12px;">${t('portfolio')}</h3>
 
     <div class="stat-grid">
       <div class="stat-item">
-        <label>Капитал</label>
+        <label>${t('capital')}</label>
         <div class="val mono" style="color:var(--blue);">${fmtUSD(totalCap)}</div>
       </div>
       <div class="stat-item">
-        <label>PnL Сделок</label>
+        <label>${t('pnl')}</label>
         <div class="val mono" style="color:${pnl >= 0 ? 'var(--green)' : 'var(--red)'};">
           ${pnl >= 0 ? '+' : ''}${fmtUSD(pnl)}
         </div>
@@ -930,7 +1128,7 @@ function renderPortfolioView(container, u) {
     </div>
 
     <div class="card-panel">
-      <h4 style="font-weight:800; margin-bottom:10px;">Открытые Позиции</h4>
+      <h4 style="font-weight:800; margin-bottom:10px;">${t('openPos')}</h4>
       ${Object.keys(u.portfolio).filter(s => u.portfolio[s] > 0).map(s => {
         const q = u.portfolio[s];
         const currP = ASSETS[s].price;
@@ -942,7 +1140,7 @@ function renderPortfolioView(container, u) {
           <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--border);">
             <div>
               <b style="font-size:14px;">${s}</b>
-              <div style="font-size:11px; color:var(--text-muted);">${q.toFixed(4)} ${s} (по ${fmtUSD(avgP)})</div>
+              <div style="font-size:11px; color:var(--text-muted);">${q.toFixed(4)} ${s}</div>
             </div>
             <div style="text-align:right;">
               <div class="mono" style="font-weight:800; font-size:14px;">${fmtUSD(val)}</div>
@@ -952,7 +1150,7 @@ function renderPortfolioView(container, u) {
             </div>
           </div>
         `;
-      }).join('') || '<div style="font-size:12px; color:var(--text-muted); text-align:center; padding:12px;">Нет активных позиций</div>'}
+      }).join('') || `<div style="font-size:12px; color:var(--text-muted); text-align:center; padding:12px;">${t('noPos')}</div>`}
     </div>
   `;
 }
@@ -962,51 +1160,63 @@ function renderProfileView(container, u) {
   const prefObj = SHOP.prefixes.find(p => p.id === u.prefix) || SHOP.prefixes[0];
   const nickObj = SHOP.nicks.find(n => n.id === u.nickColor) || SHOP.nicks[0];
   const nextXP = getReqXP(u.level);
-  const xpPct = Math.min(100, Math.floor((u.xp / nextXP) * 100));
+
+  const langOptions = [
+    { code: 'ru', label: 'RU' },
+    { code: 'en', label: 'EN' }
+  ].map(l => `<option value="${l.code}" ${l.code === currentLang ? 'selected' : ''}>${l.label}</option>`).join('');
 
   container.innerHTML = `
-    <div style="display:flex; align-items:center; gap:14px; margin-bottom:16px;">
-      <div onclick="document.getElementById('avatar-input').click()" style="cursor:pointer;">
-        ${renderAvatarHTML(u, 54)}
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+      <div style="display:flex; align-items:center; gap:14px;">
+        <div onclick="document.getElementById('avatar-input').click()" style="cursor:pointer;">
+          ${renderAvatarHTML(u, 54)}
+        </div>
+        <div>
+          <div>
+            <h3 style="font-weight:900; font-size:18px;">
+              ${prefObj.label ? `<span style="font-size:11px; padding:2px 6px; border-radius:4px; background:var(--blue-bg); color:var(--blue); border:1px solid rgba(41,98,255,0.3); margin-right:4px;">${prefObj.label}</span>` : ''}
+              <span style="color:${nickObj.color}">${u.login}</span>
+            </h3>
+            ${u.isVeteran ? `<div class="veteran-badge">Ветеран</div>` : ''}
+          </div>
+          <div style="font-size:11.5px; color:var(--text-muted); margin-top:4px;">LVL ${u.level} (${u.xp} / ${nextXP} XP)</div>
+        </div>
       </div>
-      <div style="flex:1;">
-        <div style="display:flex; align-items:center; gap:8px;">
-          <h3 style="font-weight:900; font-size:18px;">
-            ${prefObj.label ? `<span style="font-size:11px; padding:2px 6px; border-radius:4px; background:var(--blue-bg); color:var(--blue); border:1px solid rgba(41,98,255,0.3); margin-right:4px;">${prefObj.label}</span>` : ''}
-            <span style="color:${nickObj.color}">${u.login}</span>
-          </h3>
-        </div>
-        <div style="font-size:11.5px; color:var(--text-muted); margin-top:2px;">Уровень ${u.level} (${u.xp} / ${nextXP} XP)</div>
-        <div style="width:100%; height:4px; background:var(--bg-input); border-radius:4px; margin-top:6px; overflow:hidden;">
-          <div style="width:${xpPct}%; height:100%; background:var(--blue); border-radius:4px;"></div>
-        </div>
+      <div>
+        <select class="lang-select-accent" onchange="changeLanguage(this.value)">${langOptions}</select>
       </div>
     </div>
 
     <div class="card-panel">
-      <h4 style="font-weight:800; margin-bottom:8px;">Промокод</h4>
+      <h4 style="font-weight:800; margin-bottom:8px;">${t('promoTitle')}</h4>
       <div style="display:flex; gap:8px;">
-        <input type="text" id="promo-input" class="inp mono" placeholder="ВВЕДИТЕ ПРОМОКОД" style="text-transform:uppercase;">
-        <button class="btn primary" onclick="applyPromo()">Применить</button>
+        <input type="text" id="promo-input" class="inp mono" placeholder="${t('promoInp')}" style="text-transform:uppercase;">
+        <button class="btn primary" onclick="applyPromo()" ontouchend="applyPromo()">${t('promoBtn')}</button>
       </div>
     </div>
 
     <div class="card-panel">
-      <h4 style="font-weight:800; margin-bottom:10px;">Косметический Магазин</h4>
-      
+      <h4 style="font-weight:800; margin-bottom:10px;">${t('shopTitle')}</h4>
       <div class="shop-tabs">
-        <button class="shop-tab ${shopSubTab === 'frames' ? 'active' : ''}" onclick="switchShopTab('frames')">Рамки (${SHOP.frames.length})</button>
-        <button class="shop-tab ${shopSubTab === 'nicks' ? 'active' : ''}" onclick="switchShopTab('nicks')">Цвета ников (${SHOP.nicks.length})</button>
-        <button class="shop-tab ${shopSubTab === 'prefixes' ? 'active' : ''}" onclick="switchShopTab('prefixes')">Префиксы (${SHOP.prefixes.length})</button>
+        <button class="shop-tab ${shopSubTab === 'frames' ? 'active' : ''}" onclick="switchShopTab('frames')">${t('frames')}</button>
+        <button class="shop-tab ${shopSubTab === 'nicks' ? 'active' : ''}" onclick="switchShopTab('nicks')">${t('nicks')}</button>
+        <button class="shop-tab ${shopSubTab === 'prefixes' ? 'active' : ''}" onclick="switchShopTab('prefixes')">${t('prefixes')}</button>
       </div>
-
       <div class="shop-grid" id="shop-items-grid"></div>
     </div>
 
-    <button class="btn sell full" style="margin-top:4px;" onclick="logout()">Выйти из аккаунта</button>
+    <button class="btn sell full" style="margin-top:4px;" onclick="logout()" ontouchend="logout()">${t('logout')}</button>
   `;
 
   renderShopItems();
+}
+
+function changeLanguage(lang) {
+  currentLang = lang;
+  localStorage.setItem('treadems_lang', lang);
+  updateUILabels();
+  renderProfileView(document.getElementById('main-view'), getUser());
 }
 
 function switchShopTab(tab) {
@@ -1051,7 +1261,7 @@ function renderShopItems() {
           <div style="font-size:12.5px; font-weight:800; margin-bottom:2px;">${item.name}</div>
           <div class="mono" style="font-size:11px; color:var(--text-muted); margin-bottom:6px;">${item.price === 0 ? 'Бесплатно' : fmtUSD(item.price)}</div>
         </div>
-        <button class="${btnClass}" onclick="handleShopAction('${shopSubTab}', '${item.id}', ${item.price})">${btnText}</button>
+        <button class="${btnClass}" onclick="handleShopAction('${shopSubTab}', '${item.id}', ${item.price})" ontouchend="handleShopAction('${shopSubTab}', '${item.id}', ${item.price})">${btnText}</button>
       </div>
     `;
   }).join('');
@@ -1087,13 +1297,18 @@ function handleShopAction(category, id, price) {
 function applyPromo() {
   const code = document.getElementById('promo-input').value.trim().toUpperCase();
   const u = getUser();
+  
+  if (!u.usedPromos) u.usedPromos = [];
+
+  if (u.usedPromos.includes(code)) {
+    toast('Этот промокод уже был активирован!', 'err');
+    return;
+  }
+
   if (PROMOS[code]) {
     const p = PROMOS[code];
     if (p.cash) u.cash += p.cash;
-    if (p.prefix) {
-      if (!u.inventory.prefixes.includes(p.prefix)) u.inventory.prefixes.push(p.prefix);
-      u.prefix = p.prefix;
-    }
+    u.usedPromos.push(code);
     toast(p.msg, 'ok');
     saveDB(); 
     renderHeader(); 
@@ -1123,7 +1338,9 @@ function logout() {
   document.getElementById('auth-screen').classList.remove('hidden');
 }
 
-window.addEventListener('resize', () => { if (currentNav === 'trade') drawChart(); });
+window.addEventListener('resize', () => { 
+  if (currentNav === 'trade') drawChart();
+});
 
 if (DB.session && DB.users[DB.session]) {
   startApp();
